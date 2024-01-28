@@ -14,7 +14,7 @@ class NetworkScannerApp:
         self.label.pack(pady=10)
 
         self.entry = tk.Entry(root, width=30)
-        self.entry.insert(0, "192.168.1.1-255")
+        self.entry.insert(0, "192.168.1.1-192.168.1.255")
         self.entry.pack(pady=10)
 
         self.timeout_label = tk.Label(root, text="Enter Timeout (seconds):")
@@ -33,8 +33,8 @@ class NetworkScannerApp:
         self.result_tree.column("MAC", anchor=tk.W, width=150)
 
         self.result_tree.heading("#0", text="", anchor=tk.W)
-        self.result_tree.heading("IP", text="IP", anchor=tk.W)
-        self.result_tree.heading("MAC", text="MAC", anchor=tk.W)
+        self.result_tree.heading("IP", text="IP Address", anchor=tk.W)
+        self.result_tree.heading("MAC", text="MAC Address", anchor=tk.W)
 
         self.result_tree.pack(pady=10)
 
@@ -77,13 +77,17 @@ class NetworkScannerApp:
         self.root.after(100, self.check_result_queue)
 
     def scan_ip_range(self, ip_range, num_threads, timeout):
-        ip_list = ip_range.split('-')
-        ip_template = ip_list[0].rsplit('.', 1)[0]
+        start_ip, end_ip = ip_range.split('-')
+        ip_template = start_ip.rsplit('.', 2)[0]
+        print(ip_template)
 
-        start_ip, end_ip = ip_list[0][-1], ip_list[-1]
+        ip_template, start_first, start_second = [start_ip.rsplit('.', 2)[i] for i in range(0, 3)]
+        print(ip_template, start_first, start_second)
+
+        end_first, end_second = [end_ip.rsplit('.', 2)[i] for i in range(1, 3)]
         devices = []
         with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
-            futures = [executor.submit(self.scan, f"{ip_template}.{i}", timeout) for i in range(int(start_ip), int(end_ip) + 1)]
+            futures = [executor.submit(self.scan, f"{ip_template}.{i}.{j}", timeout) for i in range(int(start_first), int(end_first) + 1) for j in range(int(start_second), int(end_second) + 1)]
             
             for future in concurrent.futures.as_completed(futures):
                 result = future.result()
@@ -98,8 +102,8 @@ class NetworkScannerApp:
             while True:
                 ip_range, result = self.result_queue.get_nowait()
                 if result is None:
-                    # Сканирование для текущего ip_range завершено
-                    self.result_tree.insert("", "end", values=("", ""))  # Empty line for result separation
+
+                    self.result_tree.insert("", "end", values=("", ""))
                     messagebox.showinfo("Scan Completed", f"Scan completed for {ip_range}.")
                     break
                 else:
