@@ -63,14 +63,13 @@ class NetworkScannerApp:
             messagebox.showwarning("Warning", "Please enter an IP range.")
             return
 
-        # Обнуляем результаты для текущего ip_range
         self.results_dict[ip_range] = []
         self.unique_results = []
 
         self.result_tree.delete(*self.result_tree.get_children())
 
         num_threads = int(self.thread_combo.get())
-        timeout = float(self.timeout_entry.get())  # Преобразуем значение timeout в число
+        timeout = float(self.timeout_entry.get())
         self.scan_thread = threading.Thread(target=self.scan_ip_range, args=(ip_range, num_threads, timeout))
         self.scan_thread.start()
 
@@ -79,13 +78,11 @@ class NetworkScannerApp:
     def scan_ip_range(self, ip_range, num_threads, timeout):
         start_ip, end_ip = ip_range.split('-')
         ip_template = start_ip.rsplit('.', 2)[0]
-        print(ip_template)
 
         ip_template, start_first, start_second = [start_ip.rsplit('.', 2)[i] for i in range(0, 3)]
-        print(ip_template, start_first, start_second)
 
         end_first, end_second = [end_ip.rsplit('.', 2)[i] for i in range(1, 3)]
-        devices = []
+
         with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
             futures = [executor.submit(self.scan, f"{ip_template}.{i}.{j}", timeout) for i in range(int(start_first), int(end_first) + 1) for j in range(int(start_second), int(end_second) + 1)]
             
