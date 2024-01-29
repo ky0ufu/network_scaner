@@ -7,9 +7,9 @@ nmap, ncap
 # build command
 ``` bash
 pyinstaller --onefile  --windowed  scan.py
-
 ```
 
+```
 # input
 ip range
 ## example
