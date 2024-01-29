@@ -19,8 +19,8 @@ ip range
 192.168.0.1-192.168.50.255 /
 but it's more slowly /
 
-## ping timeout in sec
+ping timeout in sec /
 
-## count of threads
+count of threads
 
 
