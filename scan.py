@@ -4,6 +4,7 @@ import concurrent.futures
 import threading
 from scapy.all import ARP, Ether, srp
 import queue
+import socket
 
 class NetworkScannerApp:
     def __init__(self, root):
@@ -14,7 +15,7 @@ class NetworkScannerApp:
         self.label.pack(pady=10)
 
         self.entry = tk.Entry(root, width=30)
-        self.entry.insert(0, "192.168.1.1-192.168.1.255")
+        self.entry.insert(0, get_range())
         self.entry.pack(pady=10)
 
         self.timeout_label = tk.Label(root, text="Enter Timeout (seconds):")
@@ -140,6 +141,16 @@ class NetworkScannerApp:
                 for result in results:
                     self.result_tree.insert("", "end", values=(result['ip'], result['mac']))
 
+
+def get_range():
+    hostname = socket.gethostname()
+
+    local_ip = socket.gethostbyname(hostname)
+    if local_ip:
+        ip_template, start_first = [local_ip.rsplit('.', 2)[i] for i in range(0, 2)]
+        return f"{ip_template}.{start_first}.0-{ip_template}.{start_first}.254"
+    return "192.168.1.1-192.168.1.255"
+    
 
 if __name__ == "__main__":
     root = tk.Tk()
