@@ -41,8 +41,8 @@ class NetworkScannerApp:
 
         self.thread_label = tk.Label(root, text="Select number of threads:")
         self.thread_label.pack(pady=5)  
-        self.thread_combo = ttk.Combobox(root, values=["25", "50", "100"])
-        self.thread_combo.set("50")
+        self.thread_combo = ttk.Combobox(root, values=["25", "50", "100", "255"])
+        self.thread_combo.set("255")
         self.thread_combo.pack(pady=10)
 
         self.result_queue = queue.Queue()
